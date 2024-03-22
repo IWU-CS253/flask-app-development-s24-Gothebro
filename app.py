@@ -68,7 +68,7 @@ def close_db(error):
 @app.route('/')
 def show_entries():
     db = get_db()
-    cur = db.execute('select * from entries order by id desc')
+    cur = db.execute('SELECT * FROM entries ORDER BY id DESC')
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
@@ -90,3 +90,17 @@ def delete_entry():
     db.commit()
     flash('Entry deleted successfully')
     return redirect(url_for('show_entries'))
+
+
+@app.route('/filter', methods=['POST'])
+def filter_entries():
+    db = get_db()
+    user_category = request.form.get('user_category')
+    if user_category:
+        # Corrected the parameter passing here
+        cur = db.execute('SELECT * FROM entries WHERE category = ? ORDER BY id DESC', (user_category,))
+    else:
+        cur = db.execute('SELECT * FROM entries ORDER BY id DESC')
+    entries = cur.fetchall()
+    return render_template('show_entries.html', entries=entries)
+
